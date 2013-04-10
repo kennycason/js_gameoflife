@@ -3,6 +3,10 @@ function Simulation() {
     this.running = true;
 
     this.entities = [];
+    
+    this.babies = [];
+    
+    this.maxEntities = 250;
 
     this.init = function() {
         CANVAS.init();
@@ -46,39 +50,68 @@ function Simulation() {
     
     this.cycle = function() {
         CANVAS.clear();
+        // handle entities
         for(var i = 0; i < this.entities.length; i++) {
             this.handleEntity(this.entities[i]);
+            
             if(!this.entities[i].alive()) {
-                this.entities.splice(i, 50);
+                this.entities.splice(i, 1);
+            } 
+        }
+        
+        // add babies to world
+        if(this.babies.length > 0) {
+            $("#babies").html(this.babies.length + " babies");
+        }
+        for(var i = 0; i < this.babies.length; i++) {
+            if(this.entities.length < this.maxEntities) {
+                this.entities.push(this.babies[i]);
             }
         }
+        this.babies = [];
     }
 
     this.handleEntity = function(e) {
-        if(this.entities.length < 150) {
+        this.reproduce(e);
+        e.move();
+        e.draw();
+        
+    }
+    
+    this.reproduce = function(e) {
+        if(e.canReproduce() && this.entities.length < this.maxEntities) {
             var e2;
             for(var i = 0; i < this.entities.length; i++) {
                 e2 = this.entities[i];
-                if(e.id != e2.id) {
+                if(e != e2 && e2.canReproduce()) {
                     var d = Math.sqrt( (e2.x - e.x) * (e2.x - e.x) + (e2.y- e.y) * (e2.y - e.y) );
-                    if(d < 2) {
-                        var n = UTIL.dice(2);
-                        for(var j = 0; j < n; j++) {
-                            var baby = new Entity(this.entities.length, this);
-                            baby.r = (e.r + e2.r) / 2;
-                            baby.g = (e.g + e2.g) / 2;
-                            baby.b = (e.b + e2.b) / 2;
-                            baby.color = UTIL.rgbToHtml(baby.r, baby.g, baby.b);
-                            this.entities.push(baby);
-                        }
+                    if(d < 4) {
+                        this.makeBabies(e, e2);
                     }
                 }
             }
         }
-        
-        e.move();
-        e.draw();
-        
+    }
+    
+    this.makeBabies = function(e, e2) {
+        if(this.babies.length > this.maxEntities) {
+            return;
+        }
+        e.hp = 0;
+        e2.hp = 0;
+        // e.reproduced = true;
+        // e2.reproduced = true;
+        var n = UTIL.dice(5) + 1;
+        for(var i = 0; i < n; i++) {
+            var baby = new Entity(this.entities.length, this);
+            baby.r = (e.r);
+            baby.g = (e.g + e2.g) / 2;
+            baby.b = (e2.b);
+            baby.color = UTIL.rgbToHtml(baby.r, baby.g, baby.b);
+            baby.x = e.x;
+            baby.y = e2.y;
+            this.babies.push(baby);
+        }   
     }
 
 }
@@ -105,6 +138,10 @@ function Entity(id, sim) {
     
     this.ydir = UTIL.dice(10) - 5;
     
+    // this.reproduced = false;
+    
+    this.bornTime = UTIL.getTime();
+    
     this.move = function() {
         this.x += this.xdir;
         this.y += this.ydir;
@@ -120,12 +157,17 @@ function Entity(id, sim) {
             collision = true;
         }
         if(collision) {
-            this.hp -= 0.1;
+            this.hp -= 0.2;
         }
     }
     
     this.draw = function() {
         CANVAS.drawRect(this.x - this.hp / 2, this.y - this.hp / 2, this.hp, this.color);
+    }
+    
+    this.canReproduce = function() {
+        var val = UTIL.getTime() - this.bornTime > 1000; // must be 2 seconds old
+        return val;
     }
     
     this.alive = function() {
@@ -188,6 +230,10 @@ CANVAS.clear = function() {
 }
 
 UTIL = {};
+
+UTIL.getTime = function() {
+    return new Date().getTime();
+}
 
 UTIL.rgbToHtml = function(r, g, b) {
     var decColor = 0x1000000 + b + 0x100 * g + 0x10000 * r ;
