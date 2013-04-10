@@ -63,6 +63,7 @@ function Simulation() {
         if(this.babies.length > 0) {
             $("#babies").html(this.babies.length + " babies");
         }
+        $("#avg_hp").html(this.averagePopulationHP() + " Avg HP");
         for(var i = 0; i < this.babies.length; i++) {
             if(this.entities.length < this.maxEntities) {
                 this.entities.push(this.babies[i]);
@@ -93,12 +94,21 @@ function Simulation() {
         }
     }
     
+    this.averagePopulationHP = function() {
+        if(this.entities.length == 0) {
+            return 'Nan';
+        }
+        var tot = 0;
+        for(var i = 0; i < this.entities.length; i++) {
+            tot += this.entities[i].hp;
+        }
+        return (tot / this.entities.length).toFixed(2);
+    }
+    
     this.makeBabies = function(e, e2) {
         if(this.babies.length > this.maxEntities) {
             return;
         }
-        e.hp = 0;
-        e2.hp = 0;
         // e.reproduced = true;
         // e2.reproduced = true;
         var n = UTIL.dice(5) + 1;
@@ -110,8 +120,11 @@ function Simulation() {
             baby.color = UTIL.rgbToHtml(baby.r, baby.g, baby.b);
             baby.x = e.x;
             baby.y = e2.y;
+            baby.hp = (e.hp + e2.hp) / 2 + UTIL.dice(2);
             this.babies.push(baby);
         }   
+        e.hp = 0;
+        e2.hp = 0;
     }
 
 }
