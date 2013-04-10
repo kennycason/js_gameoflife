@@ -6,7 +6,7 @@ function Simulation() {
     
     this.babies = [];
     
-    this.maxEntities = 250;
+    this.maxEntities = 75;
 
     this.init = function() {
         CANVAS.init();
@@ -120,7 +120,7 @@ function Simulation() {
             baby.color = UTIL.rgbToHtml(baby.r, baby.g, baby.b);
             baby.x = e.x;
             baby.y = e2.y;
-            baby.hp = (e.hp + e2.hp) / 2 + UTIL.dice(2);
+            baby.hp = (e.hp + e2.hp) / 2 + UTIL.dice(3);
             this.babies.push(baby);
         }   
         e.hp = 0;
