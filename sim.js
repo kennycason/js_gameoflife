@@ -7,8 +7,8 @@ function Simulation() {
     this.init = function() {
         CANVAS.init();
         this.entities = [];
-        for(var i = 0; i < 500; i++) {
-            this.entities[i] = new Entity(this);
+        for(var i = 0; i < 50; i++) {
+            this.entities[i] = new Entity(i, this);
         }
         
         this.running = true;
@@ -55,17 +55,45 @@ function Simulation() {
     }
 
     this.handleEntity = function(e) {
+        if(this.entities.length < 150) {
+            var e2;
+            for(var i = 0; i < this.entities.length; i++) {
+                e2 = this.entities[i];
+                if(e.id != e2.id) {
+                    var d = Math.sqrt( (e2.x - e.x) * (e2.x - e.x) + (e2.y- e.y) * (e2.y - e.y) );
+                    if(d < 2) {
+                        var n = UTIL.dice(2);
+                        for(var j = 0; j < n; j++) {
+                            var baby = new Entity(this.entities.length, this);
+                            baby.r = (e.r + e2.r) / 2;
+                            baby.g = (e.g + e2.g) / 2;
+                            baby.b = (e.b + e2.b) / 2;
+                            baby.color = UTIL.rgbToHtml(baby.r, baby.g, baby.b);
+                            this.entities.push(baby);
+                        }
+                    }
+                }
+            }
+        }
+        
         e.move();
         e.draw();
+        
     }
 
 }
 
-function Entity(sim) {
+function Entity(id, sim) {
+    
+    this.id = id;
     
     this.sim = sim
+    
+    this.r = UTIL.dice(256);
+    this.g = UTIL.dice(256);
+    this.b = UTIL.dice(256);
 
-    this.color = UTIL.rgbToHtml(UTIL.dice(256), UTIL.dice(256), UTIL.dice(256));
+    this.color = UTIL.rgbToHtml(this.r, this.g, this.b);
     
     this.x = UTIL.dice(800);
     
