@@ -1,3 +1,236 @@
+function GameOfLife(scale) {
+    
+    this.width = 0;
+    
+    this.height = 0;
+    
+    this.scale = 2;
+    
+    this.ALIVE = 1;
+    this.DEAD = 0;
+    
+    if(scale == null) {
+        this.scale = 2;
+    } else {
+        this.scale = scale;
+    }
+    
+    this.init = function() {
+        CANVAS.init();
+
+        this.width = CANVAS.width / this.scale;
+        this.height = CANVAS.height / this.scale;
+        
+        this.map = new Array(this.width);
+        this.map2 = new Array(this.height); // draw to this, then flip
+        
+       
+        for(var x = 0; x < this.width; x++) {
+            this.map[x] = new Array(this.height);
+            this.map2[x] = new Array(this.height);
+            for(var y = 0; y < this.height; y++) {
+                this.map2[x][y] = this.DEAD;
+                if(UTIL.dice(100) > 90) {
+                    this.map[x][y] = this.ALIVE;
+                } else {
+                    this.map[x][y] = this.DEAD;
+                }
+            }    
+        }
+        var that = this;
+        $(document).keyup(function(e) {
+            if (e.keyCode == 13) {
+                that.running = true;
+                that.run();
+            }   // enter
+            if (e.keyCode == 27) {
+                that.running = false;
+                $("#running").html("not running");
+            }   // esc
+        });
+    }
+    
+    this.run = function() {
+        $("#running").html("running");
+        this.running = true;
+        this.runloop();
+    }
+    
+    this.runloop = function() {
+        var that = this;
+        setTimeout(function() {
+            if(that.running) {
+                //$("#num_entites").html(that.entities.length + " alive");
+                that.cycle();
+                that.runloop();
+            }
+        }, 1);
+    }
+    
+    this.cycle = function() {
+        this.process();
+        this.draw();
+      //  alert("draw");
+    }
+    
+    this.process = function() {
+        for(var x = 0; x < this.width; x++) {
+            for(var y = 0; y < this.height; y++) {
+                /*
+                o o o
+                o x o
+                o o o
+                */
+                var neighbors = 0;
+                if(x > 0 && y > 0) { // TOP LEFT
+                    if(this.map[x - 1][y - 1] == this.ALIVE) {
+                        neighbors++;
+                    }
+                } else { // wrap around
+                    if(x == 0 && y > 0) {
+                        if(this.map[this.width - 1][y - 1] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    } else if(x > 0 && y == 0) {
+                        if(this.map[x - 1][this.height - 1] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    }/* else { // CORNERS
+                        if(this.map[CANVAS.width - 1][CANVAS.height - 1] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    }*/
+                }
+                if(y > 0) { // TOP
+                    if(this.map[x][y - 1] == this.ALIVE) {
+                        neighbors++;
+                    }
+                } else { // wrap around
+                    if(this.map[x][this.height - 1] == this.ALIVE) {
+                        neighbors++;
+                    }
+                }
+                if(x < this.width - 1 && y > 0) { // TOP RIGHT
+                    if(this.map[x + 1][y - 1] == this.ALIVE) {
+                        neighbors++;
+                    }
+                } else { // wrap around
+                    if(x == this.width - 1 && y > 0) {
+                        if(this.map[0][y - 1] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    } else if(x < this.width - 1 && y == 0) {
+                        if(this.map[x + 1][this.height - 1] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    }/* else { // CORNERS
+                        if(this.map[0][CANVAS.height - 1] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    }*/
+                }
+                if(x > 0) { // LEFT
+                    if(this.map[x - 1][y] == this.ALIVE) {
+                        neighbors++;
+                    }
+                } else { // wrap around
+                    if(this.map[this.width - 1][y] == this.ALIVE) {
+                        neighbors++;
+                    }
+                }
+                if(x < this.width - 1) { // RIGHT
+                    if(this.map[x + 1][y] == this.ALIVE) {
+                        neighbors++;
+                    }
+                } else { // wrap around
+                    if(this.map[0][y] == this.ALIVE) {
+                        neighbors++;
+                    }
+                }
+                if(x > 0 && y < this.height - 1) { // BOTTOM LEFT
+                    if(this.map[x - 1][y + 1] == this.ALIVE) {
+                        neighbors++;
+                    }
+                } else { // wrap around
+                    if(x > 0 && y == this.height - 1) {
+                        if(this.map[x - 1][0] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    } else if(x == 0 && y < this.height - 1) {
+                        if(this.map[this.width - 1][y + 1] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    }/* else { // CORNERS
+                        if(this.map[CANVAS.width - 1][0] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    }*/
+                }
+                if(y < this.height - 1) { // BOTTOM
+                    if(this.map[x][y + 1] == this.ALIVE) {
+                        neighbors++;
+                    }
+                } else { // wrap around
+                    if(this.map[x][0] == this.ALIVE) {
+                        neighbors++;
+                    }
+                }
+                if(x < this.width - 1 && y < this.height - 1) { // BOTTOM RIGHT
+                    if(this.map[x + 1][y + 1] == this.ALIVE) {
+                        neighbors++;
+                    }
+                } else { // wrap around
+                    if(x < this.width - 1 && y == this.height - 1) {
+                        if(this.map[x + 1][0] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    } else if(x == this.width - 1 && y < this.height - 1) {
+                        if(this.map[0][y + 1] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    }/* else { // CORNERS
+                        if(this.map[0][0] == this.ALIVE) {
+                            neighbors++;
+                        }
+                    }*/
+                }
+
+                // Apply rules based on neighbors
+                if(this.map[x][y] == this.ALIVE) {
+                    if(neighbors < 2 || neighbors > 3) { // under/over population, kill it
+                        this.map2[x][y] = this.DEAD;
+                    } else { // it live on
+                        this.map2[x][y] = this.ALIVE;
+                    }
+                } else {
+                    if(neighbors == 3) { // bring it back to life (reproduce)
+                         this.map2[x][y] = this.ALIVE;
+                    } else {
+                         this.map2[x][y] = this.DEAD;
+                    }
+                }
+            }  
+        }
+        var tmp = this.map;
+        this.map = this.map2;
+        this.map2 = tmp;
+    }
+    
+    this.draw = function() {
+        CANVAS.clear();
+        for(var y = 0; y < this.height; y++) {
+            for(var x = 0; x < this.width; x++) {
+                if(this.map[x][y] == this.ALIVE) {
+                    CANVAS.drawRect(x * this.scale, y * this.scale, this.scale, '#fff');
+                }
+            }    
+        }
+    }
+   
+}
+
+
+
 function Simulation() {
 
     this.running = true;
@@ -26,13 +259,13 @@ function Simulation() {
             }   // enter
             if (e.keyCode == 27) {
                 that.running = false;
-                $("#running").html("not running<br/>");
+                $("#running").html("not running");
             }   // esc
         });
     }
 
     this.run = function() {
-        $("#running").html("running<br/>");
+        $("#running").html("running");
         this.running = true;
         this.runloop();
     }
@@ -189,7 +422,7 @@ function Entity(id, sim) {
     
     this.inView = function() {
         return this.x >= 0 && this.x < CANVAS.width
-                && this.y >= 0 && this.x < CANVAS.height;
+        && this.y >= 0 && this.x < CANVAS.height;
     }
     
 }
@@ -207,7 +440,7 @@ CANVAS.width = 800;
 
 CANVAS.height = 800;
 
-CANVAS.init = function() {
+CANVAS.init = function(width, height) {
     CANVAS.canvas = $("#canvas").get(0);
     CANVAS.context = CANVAS.canvas.getContext("2d");
     CANVAS.canvasData = CANVAS.context.getImageData(0, 0, CANVAS.width, CANVAS.height);
