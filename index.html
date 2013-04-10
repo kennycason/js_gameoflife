@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="//w3.org/1999/xhtml" dir="ltr" lang="en_US">
+    <head>
+
+        <title>JS Simulations</title>
+        <meta http-equiv="Content-Language" content="en-us" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+        <meta name="Author" content="Kenny Cason" />
+        <meta name="Copyright" content="Copyright (c) 2013 Ken-Soft" /> 
+
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript" src="sim.js"></script>        
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                var sim = new Simulation();
+                sim.init();
+                sim.run();
+            });
+        </script>
+
+    </head>
+
+    <style type="text/css">
+
+        #canvas {
+            margin-left: auto;
+            margin-right: auto;
+            display:block;
+            width:800px;
+            height:800px;
+            background-color:blackc;
+        }
+        
+        .header {
+            margin-left: auto;
+            margin-right: auto;
+            width:800px;
+            
+        }
+        
+    </style>
+
+    <body>
+        <div class="header">
+        <div id="running"></div>
+        <div id="num_entites"></div>
+        </div>
+
+        <canvas id="canvas" width="800" height="800" style="border:1px solid #c3c3c3;">
+            Your browser does not support the canvas element.
+        </canvas>
+
+
+
+    </body>
+</html>
