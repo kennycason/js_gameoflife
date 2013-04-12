@@ -1,11 +1,11 @@
-function GameOfLife(scale) {
+function GameOfLife(scale, speed) {
     
     this.width = 0;
     
     this.height = 0;
     
     this.scale = 2;
-    
+ 
     this.ALIVE = 1;
     this.DEAD = 0;
     
@@ -13,6 +13,12 @@ function GameOfLife(scale) {
         this.scale = 2;
     } else {
         this.scale = scale;
+    }
+
+    if(speed == null) {
+        this.speed = 1;
+    } else {
+        this.speed = speed;
     }
     
     this.init = function() {
@@ -64,7 +70,7 @@ function GameOfLife(scale) {
                 that.cycle();
                 that.runloop();
             }
-        }, 1);
+        }, this.sleep);
     }
     
     this.cycle = function() {

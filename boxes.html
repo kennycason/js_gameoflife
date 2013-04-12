@@ -14,7 +14,7 @@
 
         <script type="text/javascript">
             $(document).ready(function() {
-                var sim = new GameOfLife(8, 1); // possible numbers are 1,2,4,8,16
+                var sim = new Simulation();
                 sim.init();
                 sim.run();
             });
@@ -37,6 +37,7 @@
             margin-left: auto;
             margin-right: auto;
             width:800px;
+
         }
         
     </style>
@@ -47,6 +48,8 @@
                 <tr>
                     <td><div id="running"></div></td>
                     <td><div id="num_entites"></div></td>
+                    <td><div id="babies"></div></td>
+                    <td><div id="avg_hp"></div></td>
                 </tr>
             </table>
 
